@@ -6,4 +6,4 @@ include_directories(./include)
 
 project (course)
 add_executable(	course
-                #main.cpp)
+                hash_set.cpp)
