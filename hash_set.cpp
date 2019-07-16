@@ -22,19 +22,15 @@ public:
     {
         BucketList &bucket = getBucket(value);
 
-        cout << __LINE__ << endl;
-
         if (!found(value, bucket))
         {
-            cout << __LINE__ << endl;
             bucket.push_front(value);
-            cout << __LINE__ << endl;
         }
     }
 
     bool Has(const Type &value) const
     {
-        return found(value, _storage[_hasher(value)]);
+        return found(value, getBucket(value));
     }
 
     void Erase(const Type &value)
@@ -44,7 +40,7 @@ public:
 
     const BucketList &GetBucket(const Type &value) const
     {
-        return _storage[_hasher(value)];
+        return getBucket(value);
     }
 
 private:
@@ -53,15 +49,17 @@ private:
 
     BucketList &getBucket(const Type &value)
     {
-        return _storage[_hasher(value)];
+        return _storage[_hasher(value) % _storage.size()];
+    }
+
+    const BucketList &getBucket(const Type &value) const
+    {
+        return _storage[_hasher(value) % _storage.size()];
     }
 
     bool found(const Type &value, const BucketList &bucket) const
     {
-        cout << __LINE__ << endl;
-        cout << "iters equal " << (bucket.begin() == bucket.end()) << endl;
         auto result = find(bucket.begin(), bucket.end(), value) != bucket.end();
-        cout << "result = " << result << endl;
         return result;
     }
 };
