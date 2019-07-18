@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include <unordered_map>
-#include <set>
 
 using namespace std;
 
@@ -15,11 +14,6 @@ struct Record
     string user;
     int timestamp;
     int karma;
-
-    bool operator<(const Record &other) const
-    {
-        return id < other.id;
-    }
 };
 
 // Реализуйте этот класс
@@ -28,41 +22,39 @@ class Database
 public:
     bool Put(const Record &record)
     {
-        auto result = _records.insert(record);
-        bool inserted = result.second;
+        auto [it, inserted] = _records.insert(make_pair(record.id, Item {record}));
 
-        if (inserted)
+        if (!inserted)
         {
-            updateIndexes(result.first);
+            return false;
         }
 
-        return inserted;
+        updateIndexes(it);
+        return true;
     }
 
     const Record *GetById(const string &id) const
     {
-        Record tmp = {id};
-        auto it = _records.find(tmp);
+        auto it = _records.find(id);
 
         if (it == _records.end())
         {
             return nullptr;
         }
 
-        return &(*it);
+        return &it->second.record;
     }
 
     bool Erase(const string &id)
     {
-        Record tmp = {id};
-        auto it = _records.find(tmp);
+        auto it = _records.find(id);
 
         if (it == _records.end())
         {
             return false;
         }
 
-        eraseFromIndexes(it);
+        eraseFromIndexes(it->second);
         _records.erase(it);
         return true;
     }
@@ -86,23 +78,37 @@ public:
     }
 
 private:
-    set<Record> _records;
-    unordered_multimap<string, set<Record>::const_iterator> _byUser;
-    multimap<int, set<Record>::const_iterator> _byTs;
-    multimap<int, set<Record>::const_iterator> _byKarma;
+    template <typename T>
+    using Index = multimap<T, const Record *>;
 
-    void updateIndexes(set<Record>::const_iterator it)
+    struct Item
     {
-        _byUser.insert({it->user, it});
-        _byTs.insert({it->timestamp, it});
-        _byKarma.insert({it->karma, it});
+        Record record;
+        Index<string>::iterator userIt;
+        Index<int>::iterator tsIt;
+        Index<int>::iterator karmaIt;
+    };
+
+    unordered_map<string, Item> _records;
+    Index<string> _byUser;
+    Index<int> _byTs;
+    Index<int> _byKarma;
+
+    template <typename Iterator>
+    void updateIndexes(Iterator it)
+    {
+        Item &item = it->second;
+        const Record *pRecord = &item.record;
+        item.userIt = _byUser.insert({pRecord->user, pRecord});
+        item.tsIt = _byTs.insert({pRecord->timestamp, pRecord});
+        item.karmaIt = _byKarma.insert({pRecord->karma, pRecord});
     }
 
-    void eraseFromIndexes(set<Record>::const_iterator it)
+    void eraseFromIndexes(const Item &item)
     {
-        eraseByValue(_byUser, it->user, it);
-        eraseByValue(_byTs, it->timestamp, it);
-        eraseByValue(_byKarma, it->karma, it);
+        _byUser.erase(item.userIt);
+        _byTs.erase(item.tsIt);
+        _byKarma.erase(item.karmaIt);
     }
 
     template <typename Pair, typename Callback>
@@ -123,23 +129,6 @@ private:
         auto first = c.lower_bound(low);
         auto last = c.upper_bound(high);
         applyCallback(make_pair(first, last), callback);
-    }
-
-    template <typename Container, typename Key, typename Value>
-    void eraseByValue(Container &c, const Key &k, const Value &v)
-    {
-        auto range = c.equal_range(k);
-        auto first = range.first;
-        auto last = range.second;
-
-        for (auto it = first; it != last; ++it)
-        {
-            if (it->second == v)
-            {
-                c.erase(it);
-                return;
-            }
-        }
     }
 };
 
