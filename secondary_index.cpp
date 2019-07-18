@@ -22,22 +22,6 @@ struct Record
     }
 };
 
-struct compareTs
-{
-    bool operator() (const set<Record>::const_iterator &i, const set<Record>::const_iterator &j) const
-    {
-        return i->timestamp < j->timestamp;
-    }
-};
-
-struct compareKarma
-{
-    bool operator() (const set<Record>::const_iterator &i, const set<Record>::const_iterator &j) const
-    {
-        return i->karma < j->karma;
-    }
-};
-
 // Реализуйте этот класс
 class Database
 {
@@ -104,8 +88,8 @@ public:
 private:
     set<Record> _records;
     unordered_multimap<string, set<Record>::const_iterator> _byUser;
-    set<set<Record>::const_iterator, compareTs> _byTs;
-    set<set<Record>::const_iterator, compareKarma> _byKarma;
+    multimap<int, set<Record>::const_iterator> _byTs;
+    multimap<int, set<Record>::const_iterator> _byKarma;
 
     void updateIndexes(set<Record>::const_iterator it)
     {
