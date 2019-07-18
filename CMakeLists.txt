@@ -9,4 +9,5 @@ add_executable(	course
                 #hash_set.cpp)
                 #set_iterator_next.cpp)
                 #hash_point.cpp)
-                hash_person.cpp)
+                #hash_person.cpp)
+                secondary_index.cpp)
