@@ -6,8 +6,10 @@ include_directories(./include)
 
 project (course)
 add_executable(	course
+                lib/xml.cpp
                 #hash_set.cpp)
                 #set_iterator_next.cpp)
                 #hash_point.cpp)
                 #hash_person.cpp)
-                secondary_index.cpp)
+                #secondary_index.cpp)
+                spendings_xml.cpp)
