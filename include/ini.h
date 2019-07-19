@@ -2,24 +2,22 @@
 #include <string>
 #include <istream>
 
-using namespace std;
-
 namespace Ini
 {
 
-using Section = unordered_map<string, string>;
+using Section = std::unordered_map<std::string, std::string>;
 
 class Document
 {
 public:
-    Section &AddSection(string name);
-    const Section &GetSection(const string &name) const;
+    Section &AddSection(std::string name);
+    const Section &GetSection(const std::string &name) const;
     size_t SectionCount() const;
 
 private:
-    unordered_map<string, Section> sections;
+    std::unordered_map<std::string, Section> sections;
 };
 
-Document Load(istream &input);
+Document Load(std::istream &input);
 
 }
