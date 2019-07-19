@@ -13,14 +13,7 @@ Section &Document::AddSection(string name)
 
 const Section &Document::GetSection(const string &name) const
 {
-    auto it = sections.find(name);
-
-    if (it == sections.end())
-    {
-        throw out_of_range("unknown section");
-    }
-
-    return it->second;
+    return sections.at(name);
 }
 
 size_t Document::SectionCount() const
