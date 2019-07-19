@@ -7,11 +7,13 @@ include_directories(./include)
 project (course)
 add_executable(	course
                 #lib/xml.cpp
-                lib/json.cpp
+                #lib/json.cpp
+                lib/ini.cpp
                 #hash_set.cpp)
                 #set_iterator_next.cpp)
                 #hash_point.cpp)
                 #hash_person.cpp)
                 #secondary_index.cpp)
                 #spendings_xml.cpp)
-                spendings_json.cpp)
+                #spendings_json.cpp)
+                test_ini.cpp)
