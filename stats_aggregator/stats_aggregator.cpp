@@ -2,6 +2,9 @@
 
 using namespace std;
 
+namespace StatsAggregators
+{
+
 template <typename T>
 ostream &operator << (ostream &os, const optional<T> &v)
 {
@@ -16,7 +19,7 @@ ostream &operator << (ostream &os, const optional<T> &v)
     return os;
 }
 
-void CompositeStatsAggregator::Process(int value)
+void Composite::Process(int value)
 {
     for (auto &aggr : aggregators)
     {
@@ -24,7 +27,7 @@ void CompositeStatsAggregator::Process(int value)
     }
 }
 
-void CompositeStatsAggregator::PrintValue(std::ostream &output) const
+void Composite::PrintValue(std::ostream &output) const
 {
     for (const auto &aggr : aggregators)
     {
@@ -33,22 +36,22 @@ void CompositeStatsAggregator::PrintValue(std::ostream &output) const
     }
 }
 
-void CompositeStatsAggregator::Add(std::unique_ptr<StatsAggregator> aggr)
+void Composite::Add(std::unique_ptr<StatsAggregator> aggr)
 {
     aggregators.push_back(std::move(aggr));
 }
 
-void SumStatsAggregator::Process(int value)
+void Sum::Process(int value)
 {
     sum += value;
 }
 
-void SumStatsAggregator::PrintValue(std::ostream &out) const
+void Sum::PrintValue(std::ostream &out) const
 {
     out << "Sum is " << sum;
 }
 
-void MinStatsAggregator::Process(int value)
+void Min::Process(int value)
 {
     if (!current_min || value < *current_min)
     {
@@ -56,12 +59,12 @@ void MinStatsAggregator::Process(int value)
     }
 }
 
-void MinStatsAggregator::PrintValue(std::ostream &out) const
+void Min::PrintValue(std::ostream &out) const
 {
     out << "Min is " << current_min;
 }
 
-void MaxStatsAggregator::Process(int value)
+void Max::Process(int value)
 {
     if (!current_max || value > *current_max)
     {
@@ -69,18 +72,18 @@ void MaxStatsAggregator::Process(int value)
     }
 }
 
-void MaxStatsAggregator::PrintValue(std::ostream &out) const
+void Max::PrintValue(std::ostream &out) const
 {
     out << "Max is " << current_max;
 }
 
-void AverageStatsAggregator::Process(int value)
+void Average::Process(int value)
 {
     sum += value;
     ++total;
 }
 
-void AverageStatsAggregator::PrintValue(std::ostream &out) const
+void Average::PrintValue(std::ostream &out) const
 {
     out << "Average is ";
     if (total == 0)
@@ -93,7 +96,7 @@ void AverageStatsAggregator::PrintValue(std::ostream &out) const
     }
 }
 
-void ModeStatsAggregator::Process(int value)
+void Mode::Process(int value)
 {
     int current_count = ++count[value];
     if (!mode || current_count > count[*mode])
@@ -102,7 +105,9 @@ void ModeStatsAggregator::Process(int value)
     }
 }
 
-void ModeStatsAggregator::PrintValue(std::ostream &out) const
+void Mode::PrintValue(std::ostream &out) const
 {
     out << "Mode is " << mode;
+}
+
 }
