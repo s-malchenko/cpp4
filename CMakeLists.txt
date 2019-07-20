@@ -11,6 +11,7 @@ add_executable(	course
                 #lib/xml.cpp
                 #lib/json.cpp
                 #lib/ini.cpp
+                lib/geo2d.cpp
 
                 #hash_set.cpp)
                 #set_iterator_next.cpp)
@@ -22,6 +23,8 @@ add_executable(	course
                 #test_ini.cpp)
                 #refactoring.cpp)
 
-                stats_aggregator/main.cpp
-                stats_aggregator/stats_aggregator.cpp
-                stats_aggregator/stats_aggregator_test.cpp)
+                #stats_aggregator/main.cpp
+                #stats_aggregator/stats_aggregator.cpp
+                #stats_aggregator/stats_aggregator_test.cpp)
+
+                collide.cpp)
