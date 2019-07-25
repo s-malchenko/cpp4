@@ -28,4 +28,5 @@ add_executable(	course
                 #stats_aggregator/stats_aggregator_test.cpp)
 
                 #collide.cpp)
-                comment_server.cpp)
+                #comment_server.cpp)
+                print_stats_2.cpp)
