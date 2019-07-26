@@ -29,4 +29,5 @@ add_executable(	course
 
                 #collide.cpp)
                 #comment_server.cpp)
-                print_stats_2.cpp)
+                #print_stats_2.cpp)
+                lazy_value.cpp)
