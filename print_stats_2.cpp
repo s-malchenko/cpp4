@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <numeric>
+#include <functional>
 
 using namespace std;
 
@@ -51,21 +52,45 @@ public:
         int count;
         input >> count;
         _data.resize(count);
+        map<string, size_t> namesM, namesW;
+        auto nameM = namesM.end();
+        auto nameW = namesW.end();
 
         for (Person &p : _data)
         {
             char gender;
             input >> p.name >> p.age >> p.income >> gender;
             p.is_male = (gender == 'M');
+
+            if (p.is_male)
+            {
+                proceedName(p.name, namesM, nameM);
+            }
+            else
+            {
+                proceedName(p.name, namesW, nameW);
+            }
+        }
+
+        if (nameM != namesM.end())
+        {
+            _nameM = nameM->first;
+        }
+
+        if (nameW != namesW.end())
+        {
+            _nameW = nameW->first;
         }
 
         sort(begin(_data), end(_data), [](const Person & lhs, const Person & rhs)
         {
             return lhs.age < rhs.age;
         });
+
+        fillByIncome();
     }
 
-    void ProceedCommands(istream &is, ostream &os)
+    void ProceedCommands(istream &is, ostream &os) const
     {
         for (string command; is >> command; )
         {
@@ -80,26 +105,19 @@ public:
                     return lhs.age < age;
                 });
 
-                os << "There are " << std::distance(adult_begin, end(_data))
+                os << "There are " << distance(adult_begin, end(_data))
                    << " adult people for maturity age " << adult_age << '\n';
             }
             else if (command == "WEALTHY")
             {
                 int count;
                 is >> count;
-
-                auto head = Head(_data, count);
-
-                partial_sort(
-                    head.begin(), head.end(), end(_data), [](const Person & lhs, const Person & rhs)
-                {
-                    return lhs.income > rhs.income;
-                });
+                auto head = Head(_byIncome, count);
 
                 int total_income = accumulate(
-                                       head.begin(), head.end(), 0, [](int cur, Person & p)
+                                       head.begin(), head.end(), 0, [](int cur, vector<Person>::const_iterator it)
                 {
-                    return p.income += cur;
+                    return cur + it->income;
                 });
                 os << "Top-" << count << " people have total income " << total_income << '\n';
             }
@@ -107,43 +125,21 @@ public:
             {
                 char gender;
                 is >> gender;
+                auto name = &_nameM;
 
-                IteratorRange range
+                if (gender == 'W')
                 {
-                    begin(_data),
-                    partition(begin(_data), end(_data), [gender](Person & p)
-                    {
-                        return p.is_male = (gender == 'M');
-                    })
-                };
-                if (range.begin() == range.end())
+                    name = &_nameW;
+                }
+
+                if (name->empty())
                 {
                     os << "No people of gender " << gender << '\n';
                 }
                 else
                 {
-                    sort(range.begin(), range.end(), [](const Person & lhs, const Person & rhs)
-                    {
-                        return lhs.name < rhs.name;
-                    });
-                    const string *most_popular_name = &range.begin()->name;
-                    int count = 1;
-                    for (auto i = range.begin(); i != range.end(); )
-                    {
-                        auto same_name_end = find_if_not(i, range.end(), [i](const Person & p)
-                        {
-                            return p.name == i->name;
-                        });
-                        auto cur_name_count = std::distance(i, same_name_end);
-                        if (cur_name_count > count)
-                        {
-                            count = cur_name_count;
-                            most_popular_name = &i->name;
-                        }
-                        i = same_name_end;
-                    }
                     os << "Most popular name among people of gender " << gender << " is "
-                       << *most_popular_name << '\n';
+                       << *name << '\n';
                 }
             }
         }
@@ -151,6 +147,42 @@ public:
 
 private:
     vector<Person> _data;
+    vector<vector<Person>::const_iterator> _byIncome;
+    string _nameM, _nameW;
+
+    void proceedName(const string &name, map<string, size_t> &data, map<string, size_t>::iterator &it)
+    {
+        auto result = data.find(name);
+
+        if (result == data.end())
+        {
+            result = data.insert({name, 1}).first;
+        }
+        else
+        {
+            ++result->second;
+        }
+
+        if (it == data.end() ||
+            it->second < result->second ||
+            (it->second == result->second && it->first > result->first))
+        {
+            it = result;
+        }
+    }
+
+    void fillByIncome()
+    {
+        for (auto it = _data.begin(); it != _data.end(); ++it)
+        {
+            _byIncome.push_back(it);
+        }
+
+        sort(_byIncome.begin(), _byIncome.end(), [](vector<Person>::const_iterator lhs, vector<Person>::const_iterator rhs)
+                {
+                    return lhs->income > rhs->income;
+                });
+    }
 };
 
 static void fillStream(ostream &os, const vector<string> &v)
@@ -242,4 +274,6 @@ int main()
     TestRunner tr;
     RUN_TEST(tr, TestSmoke);
     RUN_TEST(tr, TestDoubleSmoke);
+    Stats stats(cin);
+    stats.ProceedCommands(cin, cout);
 }
