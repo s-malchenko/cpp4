@@ -81,7 +81,7 @@ public:
                 });
 
                 os << "There are " << std::distance(adult_begin, end(_data))
-                     << " adult people for maturity age " << adult_age << '\n';
+                   << " adult people for maturity age " << adult_age << '\n';
             }
             else if (command == "WEALTHY")
             {
@@ -143,7 +143,7 @@ public:
                         i = same_name_end;
                     }
                     os << "Most popular name among people of gender " << gender << " is "
-                         << *most_popular_name << '\n';
+                       << *most_popular_name << '\n';
                 }
             }
         }
@@ -153,19 +153,93 @@ private:
     vector<Person> _data;
 };
 
+static void fillStream(ostream &os, const vector<string> &v)
+{
+    for (const auto &i : v)
+    {
+        os << i << endl;
+    }
+}
+
 void TestSmoke()
 {
-    stringstream input("11\nIvan 25 1000 M\nOlga 30 623 W\nSergey 24 825 M\nMaria 42 1254 W\nMikhail 15 215 M\nOleg 18 230 M\nDenis 53 8965 M\nMaxim 37 9050 M\nIvan 47 19050 M\nIvan 17 50 M\nOlga 23 550 W\nAGE 18\nAGE 25\nWEALTHY 5\nPOPULAR_NAME M");
+    stringstream input;
     stringstream output;
+
+    fillStream(input, {"11",
+                       "Ivan 25 1000 M",
+                       "Olga 30 623 W",
+                       "Sergey 24 825 M",
+                       "Maria 42 1254 W",
+                       "Mikhail 15 215 M",
+                       "Oleg 18 230 M",
+                       "Denis 53 8965 M",
+                       "Maxim 37 9050 M",
+                       "Ivan 47 19050 M",
+                       "Ivan 17 50 M",
+                       "Olga 23 550 W",
+                       "AGE 18",
+                       "AGE 25",
+                       "WEALTHY 5",
+                       "POPULAR_NAME M"
+                      });
 
     Stats stats(input);
     stats.ProceedCommands(input, output);
-    string expected("There are 9 adult people for maturity age 18\nThere are 6 adult people for maturity age 25\nTop-5 people have total income 39319\nMost popular name among people of gender M is Ivan\n");
-    ASSERT_EQUAL(expected, output.str());
+    stringstream expected;
+    fillStream(expected, {"There are 9 adult people for maturity age 18",
+                          "There are 6 adult people for maturity age 25",
+                          "Top-5 people have total income 39319",
+                          "Most popular name among people of gender M is Ivan"
+                         });
+    ASSERT_EQUAL(expected.str(), output.str());
+}
+
+void TestDoubleSmoke()
+{
+    stringstream input;
+    stringstream output;
+
+    fillStream(input, {"11",
+                       "Ivan 25 1000 M",
+                       "Olga 30 623 W",
+                       "Sergey 24 825 M",
+                       "Maria 42 1254 W",
+                       "Mikhail 15 215 M",
+                       "Oleg 18 230 M",
+                       "Denis 53 8965 M",
+                       "Maxim 37 9050 M",
+                       "Ivan 47 19050 M",
+                       "Ivan 17 50 M",
+                       "Olga 23 550 W",
+                       "AGE 18",
+                       "AGE 25",
+                       "WEALTHY 5",
+                       "POPULAR_NAME M",
+                       "AGE 18",
+                       "AGE 25",
+                       "WEALTHY 5",
+                       "POPULAR_NAME M"
+                      });
+
+    Stats stats(input);
+    stats.ProceedCommands(input, output);
+    stringstream expected;
+    fillStream(expected, {"There are 9 adult people for maturity age 18",
+                          "There are 6 adult people for maturity age 25",
+                          "Top-5 people have total income 39319",
+                          "Most popular name among people of gender M is Ivan",
+                          "There are 9 adult people for maturity age 18",
+                          "There are 6 adult people for maturity age 25",
+                          "Top-5 people have total income 39319",
+                          "Most popular name among people of gender M is Ivan"
+                         });
+    ASSERT_EQUAL(expected.str(), output.str());
 }
 
 int main()
 {
     TestRunner tr;
     RUN_TEST(tr, TestSmoke);
+    RUN_TEST(tr, TestDoubleSmoke);
 }
