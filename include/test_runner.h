@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <string>
 #include <vector>
@@ -114,6 +115,17 @@ public:
 private:
     int fail_count = 0;
 };
+
+template <typename K, typename V>
+std::ostream &operator<<(std::ostream &os, const std::unordered_map<K, V> &m)
+{
+    for (const auto &i : m)
+    {
+        os << "[" << i.first << ", " << i.second << "] ";
+    }
+
+    return os;
+}
 
 #define ASSERT_EQUAL(x, y) {            \
   std::ostringstream osAssert;               \

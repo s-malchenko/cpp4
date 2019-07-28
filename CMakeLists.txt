@@ -31,4 +31,5 @@ add_executable(	course
                 #comment_server.cpp)
                 #print_stats_2.cpp)
                 #lazy_value.cpp)
-                synchronized_2.cpp)
+                #synchronized_2.cpp)
+                concurrent_map_2.cpp)
