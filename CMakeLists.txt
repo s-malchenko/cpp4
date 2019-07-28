@@ -32,4 +32,5 @@ add_executable(	course
                 #print_stats_2.cpp)
                 #lazy_value.cpp)
                 #synchronized_2.cpp)
-                concurrent_map_2.cpp)
+                #concurrent_map_2.cpp)
+                polynomial.cpp)
