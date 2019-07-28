@@ -30,4 +30,5 @@ add_executable(	course
                 #collide.cpp)
                 #comment_server.cpp)
                 #print_stats_2.cpp)
-                lazy_value.cpp)
+                #lazy_value.cpp)
+                synchronized_2.cpp)
