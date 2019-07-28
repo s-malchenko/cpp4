@@ -35,4 +35,5 @@ add_executable(	course
                 #concurrent_map_2.cpp)
                 #polynomial.cpp)
                 #object_pool.cpp)
-                zoo.cpp)
+                #zoo.cpp)
+                pipeline.cpp)
