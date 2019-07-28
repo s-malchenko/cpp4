@@ -34,4 +34,5 @@ add_executable(	course
                 #synchronized_2.cpp)
                 #concurrent_map_2.cpp)
                 #polynomial.cpp)
-                object_pool.cpp)
+                #object_pool.cpp)
+                zoo.cpp)
