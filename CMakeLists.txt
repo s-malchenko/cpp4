@@ -4,6 +4,7 @@ set(CMAKE_CXX_FLAGS "-std=c++1z -O2")
 
 include_directories(./include)
 include_directories(./stats_aggregator)
+include_directories(./expression)
 
 project (course)
 add_executable(	course
@@ -36,4 +37,7 @@ add_executable(	course
                 #polynomial.cpp)
                 #object_pool.cpp)
                 #zoo.cpp)
-                pipeline.cpp)
+                #pipeline.cpp)
+
+                expression/main.cpp
+                expression/expression.cpp)
