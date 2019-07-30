@@ -3,10 +3,11 @@ cmake_minimum_required (VERSION 3.0.0)
 set(CMAKE_CXX_FLAGS "-std=c++1z -O2")
 
 include_directories(./include)
-include_directories(./stats_aggregator)
+#include_directories(./stats_aggregator)
 #include_directories(./expression)
 #include_directories(./textures)
-include_directories(./cache)
+#include_directories(./cache)
+include_directories(./raii_booking)
 
 project (course)
 add_executable(	course
@@ -51,4 +52,5 @@ add_executable(	course
                 #cache/main.cpp
                 #cache/Solution.cpp)
 
-                unique_ptr.cpp)
+                #unique_ptr.cpp)
+                raii_booking/test.cpp)
