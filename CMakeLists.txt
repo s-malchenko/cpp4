@@ -53,4 +53,6 @@ add_executable(	course
                 #cache/Solution.cpp)
 
                 #unique_ptr.cpp)
-                raii_booking/test.cpp)
+                #raii_booking/test.cpp)
+                bug1_bad.cpp
+                print_stats_testing.cpp)
