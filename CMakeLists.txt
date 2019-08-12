@@ -55,4 +55,5 @@ add_executable(	course
                 #unique_ptr.cpp)
                 #raii_booking/test.cpp)
                 #print_stats_testing.cpp)
-                domains.cpp)
+                #domains.cpp)
+                test_domains.cpp)
