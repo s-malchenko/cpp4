@@ -8,27 +8,6 @@
 
 using namespace std;
 
-bool Subdomain(string_view subdomain, string_view domain)
-{
-    auto i = subdomain.size();
-    auto j = domain.size();
-
-    if (j == 0)
-    {
-        return false;
-    }
-
-    while (i > 0 && j > 0)
-    {
-        if (subdomain[--i] != domain[--j])
-        {
-            return false;
-        }
-    }
-
-    return j == 0 && (i == 0 || subdomain[i - 1] == '.');
-}
-
 vector<string> ReadDomains(istream &in)
 {
     size_t count;
@@ -130,17 +109,6 @@ void mainCycle(istream &in, ostream &out)
     }
 }
 
-void TestSubdomain()
-{
-    ASSERT_EQUAL(Subdomain("fhdjf.ya.ru", "ya.ru"), true);
-    ASSERT_EQUAL(Subdomain("fhdjf.ya.ru", "yg.ru"), false);
-    ASSERT_EQUAL(Subdomain("ya.ru", "ya.ru"), true);
-    ASSERT_EQUAL(Subdomain("ya.ru", "ru"), true);
-    ASSERT_EQUAL(Subdomain("ru.ya", "ru"), false);
-    ASSERT_EQUAL(Subdomain("fhdjfya.ru", "ya.ru"), false);
-    ASSERT_EQUAL(Subdomain("wow.such.domain.ru", "such.domain.ru"), true);
-}
-
 void testSorting(vector<string> source, const vector<string> &expected)
 {
     SortByReversed(source);
@@ -196,7 +164,6 @@ int main()
 {
     {
         TestRunner tr;
-        RUN_TEST(tr,TestSubdomain);
         RUN_TEST(tr,TestSortByReversed);
         RUN_TEST(tr,TestDomainBanned);
         RUN_TEST(tr,TestMainCycle);
