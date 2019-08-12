@@ -177,8 +177,8 @@ string getRightAnswer(const AgeStats &stats)
 void testStats(istream &in, const AgeStats &validStats)
 {
     stringstream out;
-    // PrintStats(ComputeStats(ReadPersons(in)), out);
-    PrintStatsBad(in, out);
+    PrintStats(ComputeStats(ReadPersons(in)), out);
+    // PrintStatsBad(in, out);
     ASSERT_EQUAL(getRightAnswer(validStats), out.str());
 }
 
@@ -212,11 +212,37 @@ void TestFullOdd()
     testStats(in, expected);
 }
 
+void TestNoMales()
+{
+    stringstream in("21\n"
+        "10 0 0\n20 0 0\n30 0 1\n40 0 1\n"
+        "40 0 0\n30 0 0\n20 0 1\n10 0 1\n"
+        "10 0 0\n30 0 0\n20 0 1\n40 0 1\n"
+        "10 0 0\n30 0 0\n20 0 1\n40 0 1\n"
+        "30 0 0\n40 0 0\n10 0 1\n20 0 1\n10 0 1\n");
+    AgeStats expected{20, 20, 0, 20, 30, 0, 0};
+    testStats(in, expected);
+}
+
+void TestNoFemales()
+{
+    stringstream in("21\n"
+        "10 1 0\n20 1 0\n30 1 1\n40 1 1\n"
+        "40 1 0\n30 1 0\n20 1 1\n10 1 1\n"
+        "10 1 0\n30 1 0\n20 1 1\n40 1 1\n"
+        "10 1 0\n30 1 0\n20 1 1\n40 1 1\n"
+        "30 1 0\n40 1 0\n10 1 1\n20 1 1\n10 1 1\n");
+    AgeStats expected{20, 0, 20, 0, 0, 20, 30};
+    testStats(in, expected);
+}
+
 int main()
 {
     TestRunner tr;
     RUN_TEST(tr, TestSmoke);
     RUN_TEST(tr, TestFull);
     RUN_TEST(tr, TestFullOdd);
+    RUN_TEST(tr, TestNoMales);
+    RUN_TEST(tr, TestNoFemales);
     return 0;
 }
