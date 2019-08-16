@@ -1,12 +1,14 @@
 #include "test_runner.h"
 #include "profile.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <ctime>
 #include <map>
 #include <numeric>
 #include <ostream>
+#include <sstream>
 #include <string>
 
 using namespace std;
@@ -30,7 +32,7 @@ public:
 
     Date(time_t ts)
     {
-        tm* t = localtime(&ts);
+        tm *t = localtime(&ts);
         _day = t->tm_mday;
         _month = t->tm_mon + 1;
         _year = t->tm_year + 1900;
@@ -181,6 +183,16 @@ int ComputeDaysDiff(const Date &date_to, const Date &date_from)
     return (timestamp_to - timestamp_from) / Date::SECONDS_IN_DAY;
 }
 
+struct DateHasher
+{
+    size_t operator()(const Date &d) const
+    {
+        size_t k = 2004007;
+
+        return d.GetYear() * k * k + d.GetMonth() * k + d.GetDay();
+    };
+};
+
 /**
  * @brief      Class for budget.
  */
@@ -189,7 +201,7 @@ class Budget
 public:
     void Earn(Date from, Date to, unsigned int value)
     {
-        double dailyEarning = value / (ComputeDaysDiff(from, to) + 1.0);
+        double dailyEarning = value / (ComputeDaysDiff(to, from) + 1.0);
 
         for (Date d = from; d <= to; d = d.NextDay())
         {
@@ -199,38 +211,176 @@ public:
 
     double Income(Date from, Date to)
     {
-        return accumulate(_earnings.lower_bound(from),
-                          _earnings.upper_bound(to),
-                          0.0,
-                          [](double a, const auto &b) { return a + b.second; });
+        double result = 0;
+
+        for (Date d = from; d <= to; d = d.NextDay())
+        {
+            result += _earnings[d];
+        }
+
+        return result;
     }
 
     void PayTax(Date from, Date to)
     {
-
+        for (Date d = from; d <= to; d = d.NextDay())
+        {
+            _earnings[d] *= 0.87;
+        }
     }
 
 protected:
-    std::map<Date, double> _earnings;
+    unordered_map<Date, double, DateHasher> _earnings;
 };
 
 void BudgetCycle(std::istream &in, std::ostream &out)
 {
+    int n;
+    in >> n;
+    Budget budget;
+    out.precision(25);
 
+    for (int i = 0; i < n; ++i)
+    {
+        string cmd;
+        in >> cmd;
+        Date from(in);
+        Date to(in);
+
+        if (cmd == "Earn")
+        {
+            int value;
+            in >> value;
+            budget.Earn(from, to, value);
+        }
+        else if (cmd == "ComputeIncome")
+        {
+            out << budget.Income(from, to);
+
+            if (i != n - 1)
+            {
+                out << endl;
+            }
+        }
+        else
+        {
+            budget.PayTax(from, to);
+        }
+    }
 }
 
 /**
  * @brief      Functions for testing Budget class.
  */
-void TestEarn()
+
+void TestEarnDay()
 {
-    ASSERT(false);
+    Budget b;
+    Date date(2000, 1, 1);
+    b.Earn(date, date, 50);
+    ASSERT_EQUAL(50, b.Income(date, date));
+}
+
+void TestEarnYear()
+{
+    Budget b;
+    Date from(2014, 6, 13);
+    Date to(2015, 6, 12);
+    b.Earn(from, to, 365);
+    ASSERT_EQUAL(365, b.Income(from, to));
+
+    for (Date d = from; d < to.NextDay(); d = d.NextDay())
+    {
+        ASSERT_EQUAL(1, b.Income(d, d));
+    }
+}
+
+void TestPayTax()
+{
+    Budget b;
+    Date from(2014, 6, 13);
+    Date to(2015, 6, 12);
+    b.Earn(from, to, 365);
+    b.PayTax(from, to);
+    ASSERT_EQUAL(to_string(365 * 0.87), to_string(b.Income(from, to)));
+
+    for (Date d = from; d < to.NextDay(); d = d.NextDay())
+    {
+        ASSERT_EQUAL(0.87, b.Income(d, d));
+    }
+}
+
+void TestCycle()
+{
+    {
+        stringstream in(R"(8
+Earn 2000-01-02 2000-01-06 20
+ComputeIncome 2000-01-01 2001-01-01
+PayTax 2000-01-02 2000-01-03
+ComputeIncome 2000-01-01 2001-01-01
+Earn 2000-01-03 2000-01-03 10
+ComputeIncome 2000-01-01 2001-01-01
+PayTax 2000-01-03 2000-01-03
+ComputeIncome 2000-01-01 2001-01-01)");
+        string expected(R"(20
+18.96000000000000085265128
+28.96000000000000085265128
+27.20759999999999934061634)");
+        stringstream out;
+        BudgetCycle(in, out);
+        ASSERT_EQUAL(expected, out.str());
+    }
+    {
+        stringstream in(R"(2
+Earn 2000-01-02 2000-01-02 200000000
+ComputeIncome 2000-01-02 2001-01-02)");
+        string expected(R"(200000000)");
+        stringstream out;
+        BudgetCycle(in, out);
+        ASSERT_EQUAL(expected, out.str());
+    }
+}
+
+void TestSpeed()
+{
+    static const int ITERATIONS = 500;
+    static const int DAYS = 20;
+    Budget budget;
+    Date d(2001, 1, 1), d1 = d;
+
+    LOG_DURATION("Budget time for " + to_string(ITERATIONS) + " iterations by " + to_string(DAYS) + " days");
+
+    for (int i = 0; i < ITERATIONS; ++i)
+    {
+        budget.Earn(d1, d, 5);
+
+        for (int j = 0; j < DAYS; ++j)
+        {
+            d = d.NextDay();
+        }
+    }
+
+    d = d1;
+
+    for (int i = 0; i < ITERATIONS; ++i)
+    {
+        budget.Income(d1, d);
+
+        for (int j = 0; j < DAYS; ++j)
+        {
+            d = d.NextDay();
+        }
+    }
 }
 
 void TestBudget()
 {
     TestRunner tr;
-    RUN_TEST(tr, TestEarn);
+    RUN_TEST(tr, TestEarnDay);
+    RUN_TEST(tr, TestEarnYear);
+    RUN_TEST(tr, TestPayTax);
+    RUN_TEST(tr, TestCycle);
+    RUN_TEST(tr, TestSpeed);
 }
 
 /**
@@ -242,6 +392,9 @@ void TestBudget()
 int main()
 {
     TestBudget();
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
     BudgetCycle(cin, cout);
     return 0;
 }
