@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <iostream>
 #include <ctime>
-#include <map>
 #include <numeric>
 #include <ostream>
 #include <sstream>
@@ -199,33 +198,42 @@ struct DateHasher
 class Budget
 {
 public:
+    Budget() : _earnings(vector<double>(getIndex({2101, 1, 1}) + 1)) {}
+
     void Earn(Date from, Date to, unsigned int value)
     {
         double dailyEarning = value / (ComputeDaysDiff(to, from) + 1.0);
-
-        for (Date d = from; d <= to; d = d.NextDay())
-        {
-            _earnings[d] += dailyEarning;
-        }
+        for_each(getValue(from), getValue(to) + 1, [dailyEarning](auto & b) { b += dailyEarning; });
     }
 
-    double Income(Date from, Date to)
+    double Income(Date from, Date to) const
     {
-        return accumulate(_earnings.lower_bound(from),
-                          _earnings.upper_bound(to),
-                          0.0,
-        [](double a, const auto & b) { return a + b.second; });
+        return accumulate(getValue(from), next(getValue(to)), 0.0);
     }
 
     void PayTax(Date from, Date to)
     {
-        for_each(_earnings.lower_bound(from),
-                 _earnings.upper_bound(to),
-        [](auto & b) { b.second *= 0.87; });
+        for_each(getValue(from), next(getValue(to)), [](auto & b) { b *= 0.87; });
     }
 
 protected:
-    map<Date, double> _earnings;
+    vector<double> _earnings;
+
+    static size_t getIndex(const Date &d)
+    {
+        return ComputeDaysDiff(d, {2000, 1, 1});
+    }
+
+    vector<double>::iterator getValue(const Date &d)
+    {
+        return _earnings.begin() + getIndex(d);
+    }
+
+    vector<double>::const_iterator getValue(const Date &d) const
+    {
+        return _earnings.begin() + getIndex(d);
+    }
+
 };
 
 void BudgetCycle(std::istream &in, std::ostream &out)
