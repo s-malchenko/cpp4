@@ -198,38 +198,54 @@ struct DateHasher
 class Budget
 {
 public:
-    Budget() : _earnings(vector<double>(getIndex({2101, 1, 1}) + 1)) {}
+    struct Money
+    {
+        double earning;
+        double spending;
+    };
+
+    Budget() : _earnings(vector<Money>(getIndex( {2101, 1, 1}) + 1)) {}
 
     void Earn(Date from, Date to, unsigned int value)
     {
         double dailyEarning = value / (ComputeDaysDiff(to, from) + 1.0);
-        for_each(getValue(from), getValue(to) + 1, [dailyEarning](auto & b) { b += dailyEarning; });
+        for_each(getValue(from), getValue(to) + 1, [dailyEarning](auto & b) { b.earning += dailyEarning; });
+    }
+
+    void Spend(Date from, Date to, unsigned int value)
+    {
+        double dailySpending = value / (ComputeDaysDiff(to, from) + 1.0);
+        for_each(getValue(from), getValue(to) + 1, [dailySpending](auto & b) { b.spending += dailySpending; });
     }
 
     double Income(Date from, Date to) const
     {
-        return accumulate(getValue(from), next(getValue(to)), 0.0);
+        return accumulate(getValue(from),
+                          next(getValue(to)),
+                          0.0,
+        [](double sum, const auto & entry) { return sum + entry.earning - entry.spending; });
     }
 
-    void PayTax(Date from, Date to)
+    void PayTax(Date from, Date to, int percent = 13)
     {
-        for_each(getValue(from), next(getValue(to)), [](auto & b) { b *= 0.87; });
+        double coeff = 1.0 - percent / 100.0;
+        for_each(getValue(from), next(getValue(to)), [coeff](auto & b) { b.earning *= coeff; });
     }
 
 protected:
-    vector<double> _earnings;
+    vector<Money> _earnings;
 
     static size_t getIndex(const Date &d)
     {
         return ComputeDaysDiff(d, {2000, 1, 1});
     }
 
-    vector<double>::iterator getValue(const Date &d)
+    vector<Money>::iterator getValue(const Date &d)
     {
         return _earnings.begin() + getIndex(d);
     }
 
-    vector<double>::const_iterator getValue(const Date &d) const
+    vector<Money>::const_iterator getValue(const Date &d) const
     {
         return _earnings.begin() + getIndex(d);
     }
@@ -256,6 +272,12 @@ void BudgetCycle(std::istream &in, std::ostream &out)
             in >> value;
             budget.Earn(from, to, value);
         }
+        else if (cmd == "Spend")
+        {
+            int value;
+            in >> value;
+            budget.Spend(from, to, value);
+        }
         else if (cmd == "ComputeIncome")
         {
             out << budget.Income(from, to);
@@ -267,7 +289,9 @@ void BudgetCycle(std::istream &in, std::ostream &out)
         }
         else
         {
-            budget.PayTax(from, to);
+            int value;
+            in >> value;
+            budget.PayTax(from, to, value);
         }
     }
 }
@@ -319,25 +343,16 @@ void TestCycle()
         stringstream in(R"(8
 Earn 2000-01-02 2000-01-06 20
 ComputeIncome 2000-01-01 2001-01-01
-PayTax 2000-01-02 2000-01-03
+PayTax 2000-01-02 2000-01-03 13
 ComputeIncome 2000-01-01 2001-01-01
-Earn 2000-01-03 2000-01-03 10
+Spend 2000-12-30 2001-01-02 14
 ComputeIncome 2000-01-01 2001-01-01
-PayTax 2000-01-03 2000-01-03
+PayTax 2000-12-30 2000-12-30 13
 ComputeIncome 2000-01-01 2001-01-01)");
         string expected(R"(20
 18.96000000000000085265128
-28.96000000000000085265128
-27.20759999999999934061634)");
-        stringstream out;
-        BudgetCycle(in, out);
-        ASSERT_EQUAL(expected, out.str());
-    }
-    {
-        stringstream in(R"(2
-Earn 2000-01-02 2000-01-02 200000000
-ComputeIncome 2000-01-02 2001-01-02)");
-        string expected(R"(200000000)");
+8.460000000000000852651283
+8.460000000000000852651283)");
         stringstream out;
         BudgetCycle(in, out);
         ASSERT_EQUAL(expected, out.str());
