@@ -21,6 +21,11 @@ struct MoneyState
 {
     double earned = 0.0;
     double spent = 0.0;
+
+    MoneyState Times(double coeff) const
+    {
+        return {earned * coeff, spent * coeff};
+    }
 };
 
 ostream &operator<<(ostream &os, const MoneyState &m)
@@ -211,7 +216,7 @@ public:
 
     MoneyState Collapse(MoneyState origin, IndexSegment segment) const
     {
-        return origin * tax_.ComputeFactor() + add_.delta * segment.length();
+        return origin * tax_.ComputeFactor() + add_.delta.Times(segment.length());
     }
 
 private:
@@ -687,7 +692,8 @@ ComputeIncome 2000-01-01 2001-01-01)");
         string expected(R"(20
 18.96000000000000085265128
 8.460000000000000852651283
-8.460000000000000852651283)");
+8.460000000000000852651283
+)");
         stringstream out;
         const auto requests = ReadRequests(in);
         const auto responses = ProcessRequests(requests);
