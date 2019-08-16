@@ -57,4 +57,5 @@ add_executable(	course
                 #print_stats_testing.cpp)
                 #domains.cpp)
                 #test_domains.cpp)
-                budget.cpp)
+                #budget.cpp)
+                budget_mobile.cpp)
