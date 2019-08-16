@@ -211,26 +211,21 @@ public:
 
     double Income(Date from, Date to)
     {
-        double result = 0;
-
-        for (Date d = from; d <= to; d = d.NextDay())
-        {
-            result += _earnings[d];
-        }
-
-        return result;
+        return accumulate(_earnings.lower_bound(from),
+                          _earnings.upper_bound(to),
+                          0.0,
+        [](double a, const auto & b) { return a + b.second; });
     }
 
     void PayTax(Date from, Date to)
     {
-        for (Date d = from; d <= to; d = d.NextDay())
-        {
-            _earnings[d] *= 0.87;
-        }
+        for_each(_earnings.lower_bound(from),
+                 _earnings.upper_bound(to),
+        [](auto & b) { b.second *= 0.87; });
     }
 
 protected:
-    unordered_map<Date, double, DateHasher> _earnings;
+    map<Date, double> _earnings;
 };
 
 void BudgetCycle(std::istream &in, std::ostream &out)
@@ -391,7 +386,7 @@ void TestBudget()
  */
 int main()
 {
-    TestBudget();
+    // TestBudget();
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
