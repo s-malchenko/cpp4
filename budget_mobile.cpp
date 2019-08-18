@@ -49,11 +49,6 @@ ostream &operator<<(ostream &os, const MoneyState &m)
 
 MoneyState operator+(const MoneyState &lhs, const MoneyState &rhs)
 {
-    // if (lhs.spent || rhs.spent)
-    // {
-    //     cout << "Summing " << lhs << " and " << rhs << endl;
-    // }
-
     return {lhs.earned + rhs.earned, lhs.spent + rhs.spent};
 }
 
