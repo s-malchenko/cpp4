@@ -58,4 +58,5 @@ add_executable(	course
                 #domains.cpp)
                 #test_domains.cpp)
                 #budget.cpp)
-                budget_mobile.cpp)
+                #budget_mobile.cpp)
+                budget_mobile_legacy.cpp)
