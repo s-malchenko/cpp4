@@ -22,9 +22,23 @@ struct MoneyState
     double earned = 0.0;
     double spent = 0.0;
 
-    MoneyState Times(double coeff) const
+    void ApplyTax(double coeff)
     {
-        return {earned * coeff, spent * coeff};
+        earned *= coeff;
+    }
+
+    MoneyState &operator*=(double coeff)
+    {
+        earned *= coeff;
+        spent *= coeff;
+        return *this;
+    }
+
+    MoneyState &operator+=(const MoneyState &other)
+    {
+        earned += other.earned;
+        spent += other.spent;
+        return *this;
     }
 };
 
@@ -45,8 +59,7 @@ MoneyState operator+(const MoneyState &lhs, const MoneyState &rhs)
 
 MoneyState operator*(const MoneyState &money, double coeff)
 {
-    // cout << "Multiplying " << money << " by " << coeff << endl;
-    return {money.earned * coeff, money.spent};
+    return {money.earned * coeff, money.spent * coeff};
 }
 
 MoneyState operator*(double coeff, const MoneyState &money)
@@ -159,40 +172,24 @@ struct BulkMoneyAdder
 class BulkTaxApplier
 {
 public:
-    struct Tax
-    {
-        uint32_t count = 0;
-        int tax_percentage = 13;
-    };
-
     BulkTaxApplier(uint32_t count = 0, int tax_percentage = 13)
     {
-        taxes_.push_back({count, tax_percentage});
+        factor_ = pow((1.0 - (tax_percentage / 100.0)), count);
     }
 
     double ComputeFactor() const
     {
-        double result = 1;
-
-        for (const auto &i : taxes_)
-        {
-            // if (i.count > 0)
-            // {
-            //     cout << "Factor for " << i.tax_percentage << " percent powered by " << i.count << " is " << pow((1.0 - (i.tax_percentage / 100.0)), i.count) << endl;
-            // }
-            result *= pow((1.0 - (i.tax_percentage / 100.0)), i.count);
-        }
-
-        return result;
+        return factor_;
     }
 
-    void AddTaxes(const BulkTaxApplier& other)
+    BulkTaxApplier &operator*=(const BulkTaxApplier &other)
     {
-        taxes_.insert(taxes_.end(), other.taxes_.begin(), other.taxes_.end());
+        factor_ *= other.factor_;
+        return *this;
     }
 
 private:
-    vector<Tax> taxes_;
+    double factor_;
 };
 
 class BulkLinearUpdater
@@ -210,13 +207,16 @@ public:
 
     void CombineWith(const BulkLinearUpdater &other)
     {
-        tax_.AddTaxes(other.tax_);
-        add_.delta = add_.delta * other.tax_.ComputeFactor() + other.add_.delta;
+        tax_ *= other.tax_;
+        add_.delta.ApplyTax(other.tax_.ComputeFactor());
+        add_.delta += other.add_.delta;
     }
 
     MoneyState Collapse(MoneyState origin, IndexSegment segment) const
     {
-        return origin * tax_.ComputeFactor() + add_.delta.Times(segment.length());
+
+        origin.ApplyTax(tax_.ComputeFactor());
+        return origin += add_.delta * segment.length();
     }
 
 private:
