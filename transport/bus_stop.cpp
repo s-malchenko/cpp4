@@ -1,15 +1,12 @@
 #include "bus_stop.h"
 #include <cmath>
 
-static const double PI = 3.1415926535;
-static const unsigned int EARTH_RADIUS = 6'371'000;
-
 static inline double degreeToRad(double deg)
 {
     return deg * PI / 180.0;
 }
 
-double Coordinates::DistanceTo(const Coordinates &other)
+double Coordinates::DistanceTo(const Coordinates &other) const
 {
     double lonDelta = degreeToRad(abs(longitude - other.longitude));
     double lat1 = degreeToRad(latitude);

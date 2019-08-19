@@ -3,9 +3,6 @@
 #include "test_runner.h"
 #include "test_double_precision.h"
 
-static const double PI = 3.1415926535;
-static const unsigned int EARTH_RADIUS = 6'371'000;
-
 #define TEST_DISTANCE(start, finish, expected) \
 { \
     ASSERT(doublesEqual(start.DistanceTo(finish), expected)); \
