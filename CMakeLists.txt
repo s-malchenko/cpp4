@@ -64,6 +64,8 @@ add_executable(	course
                 #budget_mobile_legacy.cpp)
 
                 transport/main.cpp
+                transport/bus_stop.cpp
                 transport/input_parser.cpp
+                transport/test/bus_stop_test.cpp
                 transport/test/input_parser_test.cpp
                 transport/test/transport_test.cpp)
