@@ -268,8 +268,8 @@ void Multiply(size_t v, size_t l, size_t r, size_t ql, size_t qr, int percentage
         tree_values[v].ApplyTax(factor);
         return;
     }
-    Multiply(v * 2, l, (l + r) / 2, ql, qr);
-    Multiply(v * 2 + 1, (l + r) / 2, r, ql, qr);
+    Multiply(v * 2, l, (l + r) / 2, ql, qr, percentage);
+    Multiply(v * 2 + 1, (l + r) / 2, r, ql, qr, percentage);
     tree_values[v] =
         (v * 2 < VERTEX_COUNT ? tree_values[v * 2] : MoneyState{})
         + (v * 2 + 1 < VERTEX_COUNT ? tree_values[v * 2 + 1] : MoneyState{});

@@ -8,6 +8,8 @@ include_directories(include)
 #include_directories(textures)
 #include_directories(cache)
 #include_directories(raii_booking)
+include_directories(transport)
+include_directories(transport/test)
 
 project (course)
 add_executable(	course
@@ -59,4 +61,9 @@ add_executable(	course
                 #test_domains.cpp)
                 #budget.cpp)
                 #budget_mobile.cpp)
-                budget_mobile_legacy.cpp)
+                #budget_mobile_legacy.cpp)
+
+                transport/main.cpp
+                transport/input_parser.cpp
+                transport/test/input_parser_test.cpp
+                transport/test/transport_test.cpp)
