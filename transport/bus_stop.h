@@ -3,13 +3,13 @@
 
 struct Coordinates
 {
-	double latitude;
-	double longitude;
-	double DistanceTo(const Coordinates &other);
+    double latitude;
+    double longitude;
+    double DistanceTo(const Coordinates &other);
 };
 
 struct BusStop
 {
-	std::string name;
-	Coordinates location;
+    std::string name;
+    Coordinates location;
 };
