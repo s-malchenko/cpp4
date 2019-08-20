@@ -1,9 +1,9 @@
-// #include "transport_test.h"
-#include "transport_processor.h"
+#include "transport_test.h"
+// #include "transport_processor.h"
 
 int main()
 {
-    // TestTransport();
-    RunTransportProcessor();
+    TestTransport();
+    // RunTransportProcessor();
     return 0;
 }
