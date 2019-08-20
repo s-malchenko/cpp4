@@ -32,6 +32,11 @@ public:
         }
     }
 
+    void AssignStops(const std::vector<std::string_view> &stops)
+    {
+        AssignStops(stops.begin(), stops.end());
+    }
+
     size_t GetStopsCount() const
     {
         if (_routeStops.size() < 2)
@@ -52,6 +57,19 @@ public:
     size_t GetUniqueStopsCount() const
     {
         return _uniqueStops.size();
+    }
+
+    const std::unordered_set<std::string> &GetUniqueStops() const
+    {
+        return _uniqueStops;
+    }
+
+    void FillStopsInfo(StopsContainer &stopsBase) const
+    {
+        for (const auto &i : _uniqueStops)
+        {
+            stopsBase[i].AddBus(_number);
+        }
     }
 
     double GetDistance(const StopsContainer &stopsBase) const

@@ -2,6 +2,9 @@
 #include "bus_stop.h"
 #include "test_runner.h"
 #include "test_double_precision.h"
+#include <vector>
+
+using namespace std;
 
 #define TEST_DISTANCE(start, finish, expected) \
 { \
@@ -24,4 +27,23 @@ void BusStopTest_Distance()
     to = {55.632761, 37.333324};
     ASSERT(doublesEqual(from.DistanceTo(to), 8800, 100));
     ASSERT(doublesEqual(to.DistanceTo(from), 8800, 100));
+}
+
+#define TEST_BUSES(src, expected) \
+{ \
+    BusStop stop; \
+    for (const auto &i : src) \
+    { \
+        stop.AddBus(i); \
+    }\
+    ASSERT_EQUAL(stop.GetBuses(), expected); \
+}
+
+void BusStopTest_Buses()
+{
+    vector<string_view> src = {"1", "2", "3"};
+    set<string_view> expected = {"1", "2", "3"};
+    TEST_BUSES(src, expected);
+    src = {"3", "2", "1", "2", "1"};
+    TEST_BUSES(src, expected);
 }

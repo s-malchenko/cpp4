@@ -13,6 +13,7 @@ class TransportProcessor
 public:
     TransportProcessor(std::ostream &out);
     void ProcessDatabaseRequest(const std::string &request);
+    void PrepareDatabase();
     void ProcessReadingRequest(const std::string &request);
 private:
     std::ostream &_out;

@@ -2,7 +2,7 @@
 #include "input_parser.h"
 
 #include <iomanip>
-#include <iostream>
+#include <iterator>
 
 using namespace std;
 using namespace InputParser;
@@ -33,31 +33,78 @@ void TransportProcessor::ProcessDatabaseRequest(const string &request)
         string name(arg);
         auto [latitude, longitude] = ParseCoordinates(line);
         Coordinates site{latitude, longitude};
-        _stopsBase.insert({move(name), {name, site}});
+        _stopsBase.insert(make_pair(move(name), BusStop{name, site}));
+    }
+}
+
+void TransportProcessor::PrepareDatabase()
+{
+    for (const auto &[k, bus] : _busesBase)
+    {
+        bus.FillStopsInfo(_stopsBase);
     }
 }
 
 void TransportProcessor::ProcessReadingRequest(const string &request)
 {
     string_view line(request);
-    GetPart(line);
-    string num(line);
+    auto cmd = GetPart(line);
+    auto arg = string(line);
 
-    auto it = _busesBase.find(num);
-
-    _out << "Bus " << num << ": ";
-
-    if (it == _busesBase.end())
+    if (cmd == "Bus")
     {
-        _out << "not found" << endl;
+        auto it = _busesBase.find(arg);
+
+        _out << "Bus " << arg << ": ";
+
+        if (it == _busesBase.end())
+        {
+            _out << "not found";
+        }
+        else
+        {
+            auto &bus = it->second;
+            _out << bus.GetStopsCount() << " stops on route, " <<
+                 bus.GetUniqueStopsCount() << " unique stops, " <<
+                 setprecision(6) << bus.GetDistance(_stopsBase) << " route length";
+        }
     }
-    else
+    else if (cmd == "Stop")
     {
-        auto &bus = it->second;
-        _out << bus.GetStopsCount() << " stops on route, " <<
-             bus.GetUniqueStopsCount() << " unique stops, " <<
-             setprecision(6) << bus.GetDistance(_stopsBase) << " route length" << endl;
+        auto it = _stopsBase.find(arg);
+
+        _out << "Stop " << arg << ": ";
+
+        if (it == _stopsBase.end())
+        {
+            _out << "not found";
+        }
+        else
+        {
+            const auto &buses = it->second.GetBuses();
+
+            if (buses.empty())
+            {
+                _out << "no buses";
+            }
+            else
+            {
+                _out << "buses ";
+
+                for (auto it = buses.begin(); it != buses.end(); it = next(it))
+                {
+                    _out << *it;
+
+                    if (next(it) != buses.end())
+                    {
+                        _out << " ";
+                    }
+                }
+            }
+        }
     }
+
+    _out << endl;
 }
 
 void RunTransportProcessor(istream &in, ostream &out)
@@ -75,6 +122,7 @@ void RunTransportProcessor(istream &in, ostream &out)
         tp.ProcessDatabaseRequest(request);
     }
 
+    tp.PrepareDatabase();
     in >> num;
     getline(in, request);
 
