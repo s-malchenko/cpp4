@@ -17,8 +17,9 @@ public:
     void ProcessReadingRequest(const std::string &request);
 private:
     std::ostream &_out;
-    std::unordered_map<std::string, BusStop> _stopsBase;
-    std::unordered_map<std::string, BusRoute<std::unordered_map<std::string, BusStop>>> _busesBase;
+    StopsTable _stopsBase;
+    BusTable _busesBase;
+    DistanceTable _distances;
 };
 
 void RunTransportProcessor(std::istream &in = std::cin, std::ostream &out = std::cout);

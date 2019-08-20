@@ -72,6 +72,7 @@ Coordinates ParseCoordinates(string_view &src)
     stringstream(move(string(longitude))) >> first;
     TrimChars(src, " \n");
     stringstream(move(string(src))) >> second;
+    GetPart(src, ',');
     return {first, second};
 }
 

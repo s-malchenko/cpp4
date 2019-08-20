@@ -34,6 +34,7 @@ void TransportProcessor::ProcessDatabaseRequest(const string &request)
         auto [latitude, longitude] = ParseCoordinates(line);
         Coordinates site{latitude, longitude};
         _stopsBase.insert(make_pair(move(name), BusStop{name, site}));
+        ParseStopDistances(line, arg, _distances);
     }
 }
 
@@ -42,6 +43,11 @@ void TransportProcessor::PrepareDatabase()
     for (const auto &[k, bus] : _busesBase)
     {
         bus.FillStopsInfo(_stopsBase);
+    }
+
+    for (auto &[stop, table] : _distances)
+    {
+        _stopsBase.at(stop).AssignDistances(move(table));
     }
 }
 
@@ -66,7 +72,8 @@ void TransportProcessor::ProcessReadingRequest(const string &request)
             auto &bus = it->second;
             _out << bus.GetStopsCount() << " stops on route, " <<
                  bus.GetUniqueStopsCount() << " unique stops, " <<
-                 setprecision(6) << bus.GetDistance(_stopsBase) << " route length";
+                 bus.GetDistance(_stopsBase) << " route length, " <<
+                 setprecision(7) << bus.GetCurvature(_stopsBase) << " curvature";
         }
     }
     else if (cmd == "Stop")

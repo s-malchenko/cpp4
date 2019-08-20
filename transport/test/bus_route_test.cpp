@@ -8,12 +8,12 @@
 
 using namespace std;
 
-class BusRouteTest : public BusRoute<unordered_map<string, BusStop>>
+class BusRouteTest : public BusRoute
 {
 public:
     BusRouteTest(const string &num, bool ring = false) : BusRoute(num, ring) {}
     bool GetRing() const { return _ring; }
-    const optional<double> &DistanceOpt() const { return _distance; }
+    const optional<Distance> &DistanceOpt() const { return _distance; }
 };
 
 void BusRouteTest_Constructor()
@@ -55,7 +55,7 @@ static inline void addStopToBase(unordered_map<string, BusStop> &base,
     ASSERT(doublesEqual(bus.GetDistance(base), expected)); \
 }
 
-void BusRouteTest_GetDistance()
+void BusRouteTest_GetDistanceStraight()
 {
     unordered_map<string, BusStop> base;
     addStopToBase(base, "stop1", 0, 0);
@@ -83,6 +83,11 @@ void BusRouteTest_GetDistance()
              "Biryulyovo Zapadnoye"
             };
     TEST_GET_DISTANCE(stops, true, base, 4371.02);
+}
+
+void BusRouteTest_GetDistance()
+{
+
 }
 
 void BusRouteTest_GetUniqueStopsCount()

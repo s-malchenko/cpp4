@@ -17,6 +17,20 @@ long double Coordinates::DistanceTo(const Coordinates &other) const
     return acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lonDelta)) * EARTH_RADIUS;
 }
 
+Distance &Distance::operator+=(const Distance &other)
+{
+    real += other.real;
+    straight += other.straight;
+    return *this;
+}
+
+Distance &Distance::operator*=(int coeff)
+{
+    real *= coeff;
+    straight *= coeff;
+    return *this;
+}
+
 BusStop::BusStop(const string &n, Coordinates l) : name(n), location(l)
 {
 }
@@ -33,4 +47,14 @@ void BusStop::AddBus(std::string_view bus)
 const std::set<std::string_view> &BusStop::GetBuses() const
 {
     return _buses;
+}
+
+Distance BusStop::DistanceTo(const BusStop &other) const
+{
+    return {location.DistanceTo(other.location), _distances.at(other.name)};
+}
+
+void BusStop::AssignDistances(std::unordered_map<std::string, unsigned int> &&distances)
+{
+    _distances = move(distances);
 }

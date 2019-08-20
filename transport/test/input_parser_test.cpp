@@ -101,4 +101,10 @@ void InputParserTest_ParseStopDistances()
     addTableEntry(tableRight, "2", "Biryusinka", 1800);
     addTableEntry(tableRight, "2", "Universam", 2400);
     ASSERT_EQUAL(table, tableRight);
+
+    table = DistanceTable();
+    tableRight = table;
+    src = ", \n";
+    ParseStopDistances(src, name, table);
+    ASSERT_EQUAL(table, tableRight);
 }

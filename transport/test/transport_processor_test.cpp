@@ -17,6 +17,7 @@ using namespace std;
 
 void TransportProcessorTest_Run()
 {
+    /*
     string inStr(R"(10
 Stop Tolstopaltsevo: 55.611087, 37.20829
 Stop Marushkino: 55.595884, 37.209755
@@ -67,9 +68,9 @@ Stop Samara: not found
 Stop Prazhskaya: no buses
 Stop Biryulyovo Zapadnoye: buses 256 828
 )";
-    TEST_RUN(inStr, outStr);
+    TEST_RUN(inStr, outStr); */
 
-        inStr = R"(13
+        string inStr = R"(13
 Stop Tolstopaltsevo: 55.611087, 37.20829, 3900m to Marushkino
 Stop Marushkino: 55.595884, 37.209755, 9900m to Rasskazovka
 Bus 256: Biryulyovo Zapadnoye > Biryusinka > Universam > Biryulyovo Tovarnaya > Biryulyovo Passazhirskaya > Biryulyovo Zapadnoye
@@ -91,7 +92,7 @@ Stop Samara
 Stop Prazhskaya
 Stop Biryulyovo Zapadnoye
 )";
-    outStr = R"(Bus 256: 6 stops on route, 5 unique stops, 5950 route length, 1.361239 curvature
+    string outStr = R"(Bus 256: 6 stops on route, 5 unique stops, 5950 route length, 1.361239 curvature
 Bus 750: 5 stops on route, 3 unique stops, 27600 route length, 1.318084 curvature
 Bus 751: not found
 Stop Samara: not found

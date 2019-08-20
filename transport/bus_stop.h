@@ -16,6 +16,14 @@ struct Coordinates
     long double DistanceTo(const Coordinates &other) const;
 };
 
+struct Distance
+{
+    long double straight;
+    unsigned int real;
+    Distance &operator+=(const Distance &other);
+    Distance &operator*=(int coeff);
+};
+
 struct BusStop
 {
     std::string name;
@@ -24,6 +32,11 @@ struct BusStop
     BusStop(std::string &&n, Coordinates l = {});
     void AddBus(std::string_view bus);
     const std::set<std::string_view> &GetBuses() const;
+    Distance DistanceTo(const BusStop &other) const;
+    void AssignDistances(std::unordered_map<std::string, unsigned int> &&distances);
 private:
     std::set<std::string_view> _buses;
+    std::unordered_map<std::string, unsigned int> _distances;
 };
+
+using StopsTable = std::unordered_map<std::string, BusStop>;
