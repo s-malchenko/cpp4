@@ -14,7 +14,7 @@ template <typename StopsContainer>
 class BusRoute
 {
 public:
-    BusRoute(int num, bool ring = false) : _number(num), _ring(ring) {}
+    BusRoute(const std::string &num, bool ring = false) : _number(num), _ring(ring) {}
 
     void AssignStops(std::vector<std::string_view>::const_iterator first,
                      std::vector<std::string_view>::const_iterator last)
@@ -26,9 +26,26 @@ public:
             _routeStops.push_back(&(*stopIt));
         }
 
-        if (_ring && *_routeStops.back() == *_routeStops.front())
+        if (_ring && (*_routeStops.back() == *_routeStops.front()))
         {
             _routeStops.pop_back();
+        }
+    }
+
+    size_t GetStopsCount() const
+    {
+        if (_routeStops.size() < 2)
+        {
+            return _routeStops.size();
+        }
+
+        if (_ring)
+        {
+            return _routeStops.size() + 1;
+        }
+        else
+        {
+            return (_routeStops.size() * 2) - 1;
         }
     }
 
@@ -47,13 +64,13 @@ public:
         return _distance.value();
     }
 
-    int GetNumber() const
+    const std::string &GetNumber() const
     {
         return _number;
     }
 
 protected:
-    const int _number;
+    const std::string _number;
     const bool _ring;
     mutable std::optional<double> _distance;
     std::vector<const std::string *> _routeStops;
@@ -79,9 +96,7 @@ protected:
         auto second = next(first);
         auto start = first;
 
-        for (auto second = next(first);
-                second != last;
-                first = second, second = next(second))
+        for (; second != last; first = second, second = next(second))
         {
             result += distanceBetween(**first, **second, stopsBase);
         }

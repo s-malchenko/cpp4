@@ -3,6 +3,7 @@
 #include "input_parser_test.h"
 #include "bus_stop_test.h"
 #include "bus_route_test.h"
+#include "transport_processor_test.h"
 
 void TestTransport()
 {
@@ -14,4 +15,6 @@ void TestTransport()
     RUN_TEST(tr, BusRouteTest_Constructor);
     RUN_TEST(tr, BusRouteTest_GetDistance);
     RUN_TEST(tr, BusRouteTest_GetUniqueStopsCount);
+    RUN_TEST(tr, BusRouteTest_GetStopsCount);
+    RUN_TEST(tr, TransportProcessorTest_Run);
 }

@@ -19,4 +19,9 @@ void BusStopTest_Distance()
     to = {8.4, 67.4};
     TEST_DISTANCE(from, to, PI * EARTH_RADIUS / 4);
     TEST_DISTANCE(to, from, PI * EARTH_RADIUS / 4);
+
+    from = {55.595884, 37.209755};
+    to = {55.632761, 37.333324};
+    ASSERT(doublesEqual(from.DistanceTo(to), 8800, 100));
+    ASSERT(doublesEqual(to.DistanceTo(from), 8800, 100));
 }

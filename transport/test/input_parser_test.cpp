@@ -1,6 +1,7 @@
 #include "input_parser.h"
 #include "input_parser_test.h"
 #include "test_runner.h"
+#include "test_double_precision.h"
 
 #include <string>
 
@@ -67,8 +68,8 @@ void InputParserTest_ParseStops()
 { \
     string_view test(src); \
     auto [actual1, actual2] = ParseCoordinates(test); \
-    ASSERT_EQUAL(actual1, expected1); \
-    ASSERT_EQUAL(actual2, expected2); \
+    ASSERT(doublesEqual(actual1, expected1)); \
+    ASSERT(doublesEqual(actual2, expected2)); \
 }
 
 void InputParserTest_ParseCoordinates()

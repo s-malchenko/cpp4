@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-inline bool doublesEqual(double lhs, double rhs, double precision = 0.0001)
+inline bool doublesEqual(long double lhs, long double rhs, long double precision = 0.0001)
 {
     return abs(lhs - rhs) <= precision;
 }

@@ -26,7 +26,7 @@ string_view GetPart(string_view &src, char delim)
     return result;
 }
 
-static inline void trimChars(string_view &src, string_view chars)
+void TrimChars(string_view &src, string_view chars)
 {
     src.remove_prefix(min(src.size(), src.find_first_not_of(chars)));
     size_t pos = src.find_last_not_of(chars);
@@ -43,7 +43,7 @@ static inline void trimChars(string_view &src, string_view chars)
 
 vector<string_view> ParseStops(string_view &src)
 {
-    trimChars(src, " \n");
+    TrimChars(src, " \n");
     static const string_view possibleDelims(">-");
     char delim = src[src.find_first_of(possibleDelims)];
     vector<string_view> result;
@@ -51,8 +51,8 @@ vector<string_view> ParseStops(string_view &src)
     do
     {
         string_view stop = GetPart(src, delim);
-        trimChars(stop, " ");
-        trimChars(src, " ");
+        TrimChars(stop, " ");
+        TrimChars(src, " ");
 
         if (stop.size() > 0)
         {
@@ -64,14 +64,14 @@ vector<string_view> ParseStops(string_view &src)
     return result;
 }
 
-pair<double, double> ParseCoordinates(string_view &src)
+pair<long double, long double> ParseCoordinates(string_view &src)
 {
-    pair<double, double> result;
+    pair<long double, long double> result;
 
-    trimChars(src, " \n");
+    TrimChars(src, " \n");
     auto longitude = GetPart(src, ',');
     stringstream(move(string(longitude))) >> result.first;
-    trimChars(src, " \n");
+    TrimChars(src, " \n");
     stringstream(move(string(src))) >> result.second;
     return result;
 }
