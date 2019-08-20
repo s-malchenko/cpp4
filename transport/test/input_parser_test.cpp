@@ -78,3 +78,27 @@ void InputParserTest_ParseCoordinates()
     TEST_PARSE_COORDINATES("27.3, 44.3265", 27.3, 44.3265);
     TEST_PARSE_COORDINATES("27.3, 44.3265 fds", 27.3, 44.3265);
 }
+
+static inline void addTableEntry(DistanceTable &table, string_view s1, string_view s2, unsigned int len)
+{
+    table[string(s1)][string(s2)] = table[string(s2)][string(s1)] = len;
+}
+
+void InputParserTest_ParseStopDistances()
+{
+    string_view name = "1";
+    string_view src = ", 1200m to Biryulyovo Zapadnoye";
+    DistanceTable table;
+    ParseStopDistances(src, name, table);
+    DistanceTable tableRight;
+    addTableEntry(tableRight, "1", "Biryulyovo Zapadnoye", 1200);
+    ASSERT_EQUAL(table, tableRight);
+
+    name = "2";
+    src = "7500m to Rossoshanskaya ulitsa, 1800m to Biryusinka, 2400m to Universam";
+    ParseStopDistances(src, name, table);
+    addTableEntry(tableRight, "2", "Rossoshanskaya ulitsa", 7500);
+    addTableEntry(tableRight, "2", "Biryusinka", 1800);
+    addTableEntry(tableRight, "2", "Universam", 2400);
+    ASSERT_EQUAL(table, tableRight);
+}

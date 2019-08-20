@@ -2,9 +2,12 @@
 #include <string>
 #include <set>
 #include <string_view>
+#include <unordered_map>
 
 static const long double PI = 3.1415926535;
 static const unsigned int EARTH_RADIUS = 6'371'000;
+
+using DistanceTable = std::unordered_map<std::string, std::unordered_map<std::string, unsigned int>>;
 
 struct Coordinates
 {

@@ -11,6 +11,7 @@ void TestTransport()
     RUN_TEST(tr, InputParserTest_GetPart);
     RUN_TEST(tr, InputParserTest_ParseStops);
     RUN_TEST(tr, InputParserTest_ParseCoordinates);
+    RUN_TEST(tr, InputParserTest_ParseStopDistances);
     RUN_TEST(tr, BusStopTest_Distance);
     RUN_TEST(tr, BusStopTest_Buses);
     RUN_TEST(tr, BusRouteTest_Constructor);
