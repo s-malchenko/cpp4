@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.0.0)
 
-set(CMAKE_CXX_FLAGS "-std=c++1z -O2")
+set(CMAKE_CXX_FLAGS "-std=c++1z -O2 -Wall")
 
 include_directories(include)
 #include_directories(stats_aggregator)
@@ -8,8 +8,6 @@ include_directories(include)
 #include_directories(textures)
 #include_directories(cache)
 #include_directories(raii_booking)
-include_directories(transport)
-include_directories(transport/test)
 
 project (course)
 add_executable(	course
