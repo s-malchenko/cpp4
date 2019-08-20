@@ -52,7 +52,7 @@ static inline void addStopToBase(unordered_map<string, BusStop> &base,
 { \
     BusRouteTest bus("1", ring); \
     bus.AssignStops(stops.begin(), stops.end()); \
-    ASSERT(doublesEqual(bus.GetDistance(base), expected)); \
+    ASSERT_EQUAL(bus.GetDistance(base), expected); \
 }
 
 void BusRouteTest_GetDistanceStraight()
@@ -85,9 +85,45 @@ void BusRouteTest_GetDistanceStraight()
     TEST_GET_DISTANCE(stops, true, base, 4371.02);
 }
 
+static inline void addTableEntry(DistanceTable &table, string_view s1, string_view s2, unsigned int lenTo, unsigned int lenFrom)
+{
+    table[string(s1)][string(s2)] = lenTo;
+    table[string(s2)][string(s1)] = lenFrom;
+}
+
 void BusRouteTest_GetDistance()
 {
+    DistanceTable distances;
+    addTableEntry(distances, "stop1", "stop2", 200, 100);
+    addTableEntry(distances, "stop2", "stop3", 300, 150);
+    addTableEntry(distances, "stop3", "stop1", 5000, 60);
+    distances["stop4"]["stop1"] = 50;
+    distances["stop4"]["stop2"] = 250;
+    distances["stop4"]["stop3"] = 350;
+    StopsTable stopsBase;
+    addStopToBase(stopsBase, "stop1", 0, 0);
+    addStopToBase(stopsBase, "stop2", 0, 0);
+    addStopToBase(stopsBase, "stop3", 0, 0);
+    addStopToBase(stopsBase, "stop4", 0, 0);
+    AssignDistances(distances, stopsBase);
 
+    vector<string_view> stops = {"stop1", "stop2", "stop1", "stop2"};
+    TEST_GET_DISTANCE(stops, false, stopsBase, 900);
+
+    stops = {"stop1", "stop2", "stop3", "stop1"};
+    TEST_GET_DISTANCE(stops, true, stopsBase, 5500);
+
+    stops = {"stop1", "stop2", "stop3"};
+    TEST_GET_DISTANCE(stops, false, stopsBase, 750);
+
+    stops = {"stop1", "stop3"};
+    TEST_GET_DISTANCE(stops, true, stopsBase, 5060);
+
+    stops = {"stop1", "stop3"};
+    TEST_GET_DISTANCE(stops, false, stopsBase, 5060);
+
+    stops = {"stop1", "stop4", "stop3"};
+    TEST_GET_DISTANCE(stops, false, stopsBase, 800);
 }
 
 void BusRouteTest_GetUniqueStopsCount()

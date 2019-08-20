@@ -81,7 +81,7 @@ void InputParserTest_ParseCoordinates()
 
 static inline void addTableEntry(DistanceTable &table, string_view s1, string_view s2, unsigned int len)
 {
-    table[string(s1)][string(s2)] = table[string(s2)][string(s1)] = len;
+    table[string(s1)][string(s2)] = len;
 }
 
 void InputParserTest_ParseStopDistances()

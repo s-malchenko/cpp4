@@ -5,7 +5,7 @@ using namespace std;
 BusRoute::BusRoute(const std::string &num, bool ring) : _number(num), _ring(ring) {}
 
 void BusRoute::AssignStops(std::vector<std::string_view>::const_iterator first,
-                 std::vector<std::string_view>::const_iterator last)
+                           std::vector<std::string_view>::const_iterator last)
 {
     for (auto it = first; it != last; it = next(it))
     {
@@ -67,6 +67,11 @@ int BusRoute::GetDistance(const StopsTable &stopsBase) const
         _distance = computeDistance(_routeStops.begin(), _routeStops.end(), stopsBase);
     }
 
+    // if (GetCurvature(stopsBase) > 100)
+    // {
+    //     throw 1;
+    // }
+
     return _distance.value().real;
 }
 
@@ -82,15 +87,15 @@ const std::string &BusRoute::GetNumber() const
 }
 
 Distance BusRoute::distanceBetween(const std::string &stop1,
-                                const std::string &stop2,
-                                const StopsTable &stopsBase)
+                                   const std::string &stop2,
+                                   const StopsTable &stopsBase)
 {
     return stopsBase.at(stop1).DistanceTo(stopsBase.at(stop2));
 }
 
 Distance BusRoute::computeDistance(std::vector<const std::string *>::const_iterator first,
-                         std::vector<const std::string *>::const_iterator last,
-                         const StopsTable &stopsBase) const
+                                   std::vector<const std::string *>::const_iterator last,
+                                   const StopsTable &stopsBase) const
 {
     if (first == last)
     {
@@ -112,8 +117,23 @@ Distance BusRoute::computeDistance(std::vector<const std::string *>::const_itera
     }
     else
     {
-        result *= 2;
+        last = prev(start);
+        first = prev(first);
+        second = prev(second);
+
+        for (; first != last; second = first, first = prev(first))
+        {
+            result += distanceBetween(**second, **first, stopsBase);
+        }
     }
 
     return result;
+}
+
+void FillStopsInfo(const BusTable &busesBase, StopsTable &stopsBase)
+{
+    for (const auto &[k, bus] : busesBase)
+    {
+        bus.FillStopsInfo(stopsBase);
+    }
 }

@@ -24,7 +24,7 @@ Distance &Distance::operator+=(const Distance &other)
     return *this;
 }
 
-Distance &Distance::operator*=(int coeff)
+Distance &Distance::operator*=(long coeff)
 {
     real *= coeff;
     straight *= coeff;
@@ -51,10 +51,30 @@ const std::set<std::string_view> &BusStop::GetBuses() const
 
 Distance BusStop::DistanceTo(const BusStop &other) const
 {
-    return {location.DistanceTo(other.location), _distances.at(other.name)};
+    auto it = _distances.find(other.name);
+    unsigned long dist;
+
+    if (it != _distances.end())
+    {
+        dist = it->second;
+    }
+    else
+    {
+        dist = other._distances.at(name);
+    }
+
+    return {location.DistanceTo(other.location), dist};
 }
 
 void BusStop::AssignDistances(std::unordered_map<std::string, unsigned int> &&distances)
 {
     _distances = move(distances);
+}
+
+void AssignDistances(DistanceTable &distances, StopsTable &stopsBase)
+{
+    for (auto &[stop, table] : distances)
+    {
+        stopsBase.at(stop).AssignDistances(move(table));
+    }
 }

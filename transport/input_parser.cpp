@@ -76,11 +76,6 @@ Coordinates ParseCoordinates(string_view &src)
     return {first, second};
 }
 
-static inline void addTableEntry(DistanceTable &table, string_view s1, string_view s2, unsigned int len)
-{
-    table[string(s1)][string(s2)] = table[string(s2)][string(s1)] = len;
-}
-
 void ParseStopDistances(string_view &src, string_view mainStop, DistanceTable &table)
 {
     TrimChars(src, " ,\n");
@@ -90,9 +85,9 @@ void ParseStopDistances(string_view &src, string_view mainStop, DistanceTable &t
         auto part = GetPart(src, ',');
         auto distStr = GetPart(part);
         TrimChars(distStr, "m");
-        unsigned int distance = stoi(string(distStr));
+        unsigned long distance = stoul(string(distStr));
         GetPart(part); // remove "to " part
-        addTableEntry(table, mainStop, part, distance);
+        table[string(mainStop)][string(part)] = distance;
         TrimChars(src, " ,\n");
     }
 }

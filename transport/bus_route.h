@@ -38,3 +38,5 @@ protected:
 };
 
 using BusTable = std::unordered_map<std::string, BusRoute>;
+
+void FillStopsInfo(const BusTable &buses, StopsTable &stops);

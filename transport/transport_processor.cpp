@@ -40,15 +40,8 @@ void TransportProcessor::ProcessDatabaseRequest(const string &request)
 
 void TransportProcessor::PrepareDatabase()
 {
-    for (const auto &[k, bus] : _busesBase)
-    {
-        bus.FillStopsInfo(_stopsBase);
-    }
-
-    for (auto &[stop, table] : _distances)
-    {
-        _stopsBase.at(stop).AssignDistances(move(table));
-    }
+    FillStopsInfo(_busesBase, _stopsBase);
+    AssignDistances(_distances, _stopsBase);
 }
 
 void TransportProcessor::ProcessReadingRequest(const string &request)

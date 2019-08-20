@@ -19,9 +19,9 @@ struct Coordinates
 struct Distance
 {
     long double straight;
-    unsigned int real;
+    unsigned long real;
     Distance &operator+=(const Distance &other);
-    Distance &operator*=(int coeff);
+    Distance &operator*=(long coeff);
 };
 
 struct BusStop
@@ -40,3 +40,5 @@ private:
 };
 
 using StopsTable = std::unordered_map<std::string, BusStop>;
+
+void AssignDistances(DistanceTable &distances, StopsTable &stopsBase);
